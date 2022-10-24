@@ -1,15 +1,14 @@
 from dataclasses import dataclass
 
 
+@dataclass
 class InfoMessage:
+    training_type: classmethod
+    duration: float
+    distance: float
+    speed: float
+    calories: float
     """Информационное сообщение о тренировке."""
-
-    def __init__(self, training_type, duration, distance, speed, calories):
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
 
     def __str__(self):
         return self.get_message()
