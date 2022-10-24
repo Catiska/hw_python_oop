@@ -3,12 +3,12 @@ from dataclasses import dataclass
 
 @dataclass
 class InfoMessage:
+    """Информационное сообщение о тренировке."""
     training_type: classmethod
     duration: float
     distance: float
     speed: float
     calories: float
-    """Информационное сообщение о тренировке."""
 
     def __str__(self):
         return self.get_message()
