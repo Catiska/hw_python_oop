@@ -155,7 +155,7 @@ def read_package(workout_type: str, data: list) -> Training:
                          f"Доступные тренировки - {[*TRAININGS]}")
     try:
         TRAININGS[workout_type](*data)
-    except:
+    except TypeError:
         raise TypeError(f'TypeError: Неожиданные данные {data}.')
     return TRAININGS[workout_type](*data)
 
