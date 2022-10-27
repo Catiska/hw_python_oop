@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from dataclasses import asdict
+from dataclasses import dataclass, asdict
+import inspect
 
 
 @dataclass
@@ -111,12 +111,9 @@ class SportsWalking(Training):
 
 class Swimming(Training):
     """Тренировка: плавание."""
-    CALORIES_WEIGHT_MULTIPLIER = 2
-    CALORIES_MEAN_SPEED_SHIFT = 1.1
+    CALORIES_WEIGHT_MULTIPLIER: float = 2
+    CALORIES_MEAN_SPEED_SHIFT: float = 1.1
     LEN_STEP: float = 1.38
-
-    def __str__(self):
-        return type(self).__name__
 
     def __init__(self,
                  action: int,
@@ -145,24 +142,28 @@ class Swimming(Training):
             * self.weight * self.duration)
 
 
-TRAININGS = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
-
-
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    if workout_type not in TRAININGS:
+    trainings: dict[str, type] = {
+        'SWM': Swimming,
+        'RUN': Running,
+        'WLK': SportsWalking
+    }
+    if workout_type not in trainings:
         raise ValueError(f"Неожиданный способ тренировки '{workout_type}'. "
-                         f"Доступные тренировки - {[*TRAININGS]}")
-    try:
-        TRAININGS[workout_type](*data)
-    except TypeError:
-        raise TypeError(f'TypeError: Неожиданные данные {data}.')
-    return TRAININGS[workout_type](*data)
+                         f"Доступные тренировки - {[*trainings]}")
+    training_params = inspect.signature(trainings[workout_type]).parameters
+    if len(list(training_params)) != len(data):
+        raise TypeError(f'TypeError: Неожиданные данные - {data}. '
+                        f'Допустимое количество параметров - '
+                        f'{len(list(training_params))}, '
+                        f'Допустимые параметры - {list(training_params)}.')
+    return trainings[workout_type](*data)
 
 
 def main(training: Training) -> None:
     """Главная функция."""
-    print(Training.show_training_info(training))
+    print(training.show_training_info())
 
 
 if __name__ == '__main__':
