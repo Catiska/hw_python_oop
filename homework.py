@@ -151,14 +151,20 @@ def read_package(workout_type: str, data: list) -> Training:
     }
     if workout_type not in trainings:
         raise ValueError(f"Неожиданный способ тренировки '{workout_type}'. "
-                         f"Доступные тренировки - {[*trainings]}")
+                         f"Доступные тренировки - {[*trainings]}.")
     training_params = inspect.signature(trainings[workout_type]).parameters
     if len(list(training_params)) != len(data):
         raise TypeError(f'TypeError: Неожиданные данные - {data}. '
                         f'Допустимое количество параметров - '
                         f'{len(list(training_params))}, '
                         f'Допустимые параметры - {list(training_params)}.')
-    return trainings[workout_type](*data)
+    for i in data:
+        if type(i) == int or type(i) == float:
+            return trainings[workout_type](*data)
+        else:
+            raise TypeError(f'Неожиданные данные - {data}. '
+                            f'Допустимые типы данных - '
+                            f'{training_params.values()}.')
 
 
 def main(training: Training) -> None:
