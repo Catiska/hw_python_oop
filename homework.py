@@ -24,16 +24,15 @@ class InfoMessage:
 
 class Training:
     """Общий класс тренировок"""
+    M_IN_KM: float = 1000
+    MIN_IN_H: float = 60
+    CM_IN_M: float = 100
+    LEN_STEP: float = 0.65
 
     def __init__(self, action, duration, weight):
         self.action: int = action
         self.duration: float = duration
         self.weight: float = weight
-
-    M_IN_KM: float = 1000
-    MIN_IN_H: float = 60
-    CM_IN_M: float = 100
-    LEN_STEP: float = 0.65
 
     def __str__(self):
         return type(self).__name__
@@ -144,7 +143,7 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    trainings: dict[str, type] = {
+    trainings: dict[str, type[Training]] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
@@ -153,18 +152,20 @@ def read_package(workout_type: str, data: list) -> Training:
         raise ValueError(f"Неожиданный способ тренировки '{workout_type}'. "
                          f"Доступные тренировки - {[*trainings]}.")
     training_params = inspect.signature(trainings[workout_type]).parameters
+    # не могу использовать list() в строке 154, использую эту переменную
+    # как словарь в выводе ошибки ниже (167 строка)
     if len(list(training_params)) != len(data):
         raise TypeError(f'TypeError: Неожиданные данные - {data}. '
                         f'Допустимое количество параметров - '
                         f'{len(list(training_params))}, '
                         f'Допустимые параметры - {list(training_params)}.')
-    for i in data:
-        if type(i) == int or type(i) == float:
-            return trainings[workout_type](*data)
-        else:
-            raise TypeError(f'Неожиданные данные - {data}. '
+    for element in data:
+        if not isinstance(element, (int, float)):
+            raise TypeError(f'Неожиданные данные: '
+                            f'"{element}" - {type(element)}. '
                             f'Допустимые типы данных - '
-                            f'{training_params.values()}.')
+                            f'{list(training_params.values())}.')
+    return trainings[workout_type](*data)
 
 
 def main(training: Training) -> None:
